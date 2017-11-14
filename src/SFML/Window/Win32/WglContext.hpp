@@ -184,6 +184,7 @@ private:
     HDC         m_deviceContext; ///< Device context associated to the context
     HGLRC       m_context;       ///< OpenGL context
     bool        m_ownsWindow;    ///< Do we own the target window?
+    int         m_bestPixelFormat; // Our pixel format so we don't kill the CPU every time we make a surface.
 };
 
 } // namespace priv

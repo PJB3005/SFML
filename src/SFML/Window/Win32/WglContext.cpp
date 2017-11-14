@@ -406,9 +406,9 @@ int WglContext::selectBestPixelFormat(HDC deviceContext, unsigned int bitsPerPix
 ////////////////////////////////////////////////////////////
 void WglContext::setDevicePixelFormat(unsigned int bitsPerPixel)
 {
-    int bestFormat = selectBestPixelFormat(m_deviceContext, bitsPerPixel, m_settings);
+    m_bestPixelFormat = selectBestPixelFormat(m_deviceContext, bitsPerPixel, m_settings);
 
-    if (bestFormat == 0)
+    if (m_bestPixelFormat == 0)
     {
         err() << "Failed to find a suitable pixel format for device context: " << getErrorString(GetLastError()).toAnsiString() << std::endl
               << "Cannot create OpenGL context" << std::endl;
@@ -419,10 +419,10 @@ void WglContext::setDevicePixelFormat(unsigned int bitsPerPixel)
     PIXELFORMATDESCRIPTOR actualFormat;
     actualFormat.nSize    = sizeof(actualFormat);
     actualFormat.nVersion = 1;
-    DescribePixelFormat(m_deviceContext, bestFormat, sizeof(actualFormat), &actualFormat);
+    DescribePixelFormat(m_deviceContext, m_bestPixelFormat, sizeof(actualFormat), &actualFormat);
 
     // Set the chosen pixel format
-    if (SetPixelFormat(m_deviceContext, bestFormat, &actualFormat) == FALSE)
+    if (SetPixelFormat(m_deviceContext, m_bestPixelFormat, &actualFormat) == FALSE)
     {
         err() << "Failed to set pixel format for device context: " << getErrorString(GetLastError()).toAnsiString() << std::endl
               << "Cannot create OpenGL context" << std::endl;
@@ -524,7 +524,8 @@ void WglContext::createSurface(WglContext* shared, unsigned int width, unsigned 
     // Check if the shared context already exists and pbuffers are supported
     if (shared && shared->m_deviceContext && (sfwgl_ext_ARB_pbuffer == sfwgl_LOAD_SUCCEEDED))
     {
-        int bestFormat = selectBestPixelFormat(shared->m_deviceContext, bitsPerPixel, m_settings, true);
+        //int bestFormat = selectBestPixelFormat(shared->m_deviceContext, bitsPerPixel, m_settings, true);
+        int bestFormat = m_bestPixelFormat;
 
         if (bestFormat > 0)
         {
